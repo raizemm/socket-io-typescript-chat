@@ -1,4 +1,4 @@
 export enum DialogUserType {
-    NEW,
-    EDIT
+    NEW = 'new-user',
+    EDIT = 'edit-user'
 }
