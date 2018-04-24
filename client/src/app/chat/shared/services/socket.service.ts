@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import * as socketIo from 'socket.io-client';
 import { Event } from '../model/event';
 import { Message } from '../model/message';
+import { User } from '../model/user';
 
 const SERVER_URL = 'http://localhost:8080';
 
@@ -15,13 +16,15 @@ export class SocketService {
 	}
 
 	public send(message: Message): void {
-		this.socket.emit('message', message, (data) => {
-			console.log(data)
-		});
+		this.socket.emit('message', message);
 	}
 
 	public changeUsername(data: any): void {
 		this.socket.emit('changeUsername', data);
+	}
+
+	public newUser(user: User):  void {
+		this.socket.emit('newUser', user);
 	}
 
 	public onMessage(): Observable<Message> {

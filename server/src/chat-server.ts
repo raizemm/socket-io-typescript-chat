@@ -6,8 +6,8 @@ import * as logger from 'morgan';
 import * as cookieParser from 'cookie-parser';
 import * as bodyParser from 'body-parser';
 
-import { Message } from './model';
-import { ChangeUsername } from './model/user';
+import { Message, User, ChangeUsername } from './model';
+import { Users } from './sockets';
 
 export class ChatServer {
 	public static readonly PORT: number = 8080;
@@ -56,30 +56,37 @@ export class ChatServer {
 		});
 		this.io.on('connect', (socket: any) => {
 			console.log('Connected client on port %s.', this.port);
-			socket.on('message', (m: Message, cb) => {
-				console.log('[server](message): %s', JSON.stringify(m));
-				const roomName = m.roomName;
-
-				if (m.action === 0) {
-					if (this.usernames.indexOf(m.from.name) !== -1) {
-						cb(false);
-					} else {
-						this.usernames.push(m.from.name);
-						socket.username = m.from.name;
-					}
-
-					socket.join(roomName);
-					this.io.sockets.in(roomName).emit('usernames', this.usernames);
+			console.log(socket.request._query)
+			socket.on('newUser', (user: User) => {
+				if (this.usernames.indexOf(user.name) !== -1) {
+					return;
+				} else {
+					this.usernames.push(user.name);
+					socket.username = user.name;
+					socket.join(user.roomName);
+					this.io.to(user.roomName).emit('usernames', this.usernames);
 				}
+				// const users = new Users(socket, this.io, user.name, user.roomName);
+				// users.addSocket(socket)
+			});
 
-				this.io.sockets.in(roomName).emit('message', m);
-				cb(true);
+			socket.on('message', (m: Message) => {
+				console.log('[server](message): %s', JSON.stringify(m));
+
+				this.io.to(m.from.roomName).emit('message', m);
 			});
 			socket.on('changeUsername', (data: ChangeUsername) => {
-				this.usernames[data.username] = data.previousUsername;
-				socket.username = data.username;
-				// this.io.emit('message', data);
-			})
+				if (data.content.previousUsername === data.from.name) {
+					return;
+				}
+
+				const index = this.usernames.indexOf(data.content.previousUsername);
+				this.usernames.splice(index, 1, data.from.name);
+				socket.username = data.from.name;
+				this.io.to(data.from.roomName).emit('usernames', this.usernames);
+				this.io.to(data.from.roomName).emit('message', data);
+
+			});
 			socket.on('disconnect', () => {
 				const index = this.usernames.indexOf(socket.username);
 				this.usernames.splice(index, 1);

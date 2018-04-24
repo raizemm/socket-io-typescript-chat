@@ -46,8 +46,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 	// getting a reference to the items/messages within the list
 	@ViewChildren(MatListItem, {read: ElementRef}) matListItems: QueryList<MatListItem>;
 
-	constructor(private socketService: SocketService,
-	            public dialog: MatDialog) {
+	constructor(private socketService: SocketService, public dialog: MatDialog) {
 	}
 
 	ngOnInit(): void {
@@ -68,8 +67,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 	// auto-scroll fix: inspired by this stack overflow post
 	// https://stackoverflow.com/questions/35232731/angular2-scroll-to-bottom-chat-style
 	private scrollToBottom(): void {
-		console.log(this.matList.nativeElement.scrollTop)
-		console.log(this.matList.nativeElement.scrollHeight)
+		// console.log(this.matList.nativeElement.scrollTop)
+		// console.log(this.matList.nativeElement.scrollHeight)
 		try {
 			this.matList.nativeElement.scrollTop = this.matList.nativeElement.scrollHeight;
 		} catch (err) {
@@ -114,6 +113,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.openUserPopup({
 			data: {
 				username: this.user.name,
+				room: this.user.roomName,
 				title: 'Edit Details',
 				dialogType: DialogUserType.EDIT
 			}
@@ -127,7 +127,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 				return;
 			}
 			this.user.name = paramsDialog.username;
-			this.roomName = paramsDialog.roomName;
+			this.user.roomName = paramsDialog.roomName;
 			if (paramsDialog.dialogType === DialogUserType.NEW) {
 				this.initIoConnection();
 				this.sendNotification(paramsDialog, Action.JOINED);
@@ -143,7 +143,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 		}
 		this.socketService.send({
 			from: this.user,
-			roomName: this.roomName,
 			content: message
 		});
 		this.messageContent = null;
@@ -154,20 +153,20 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 		if (action === Action.JOINED) {
 			message = {
 				from: this.user,
-				roomName: this.roomName,
 				action: action
-			}
+			};
+			this.socketService.newUser(this.user)
+			this.socketService.send(message);
 		} else if (action === Action.RENAME) {
 			message = {
+				from: this.user,
 				action: action,
 				content: {
-					username: this.user.name,
 					previousUsername: params.previousUsername
 				}
 			};
 			this.socketService.changeUsername(message);
 		}
-		this.socketService.send(message);
 	}
 
 	ngOnDestroy(): void {

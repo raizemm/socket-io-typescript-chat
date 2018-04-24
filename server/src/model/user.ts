@@ -1,9 +1,9 @@
 export class User {
-	constructor(public name: string) {
+	constructor(public name: string, public roomName: string) {
 	}
 }
 
 export class ChangeUsername {
-	constructor(public username: string, public previousUsername: string) {
+	constructor(public from: User, public content: any, public action: number) {
 	}
 }

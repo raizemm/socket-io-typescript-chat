@@ -1,7 +1,7 @@
 import { Message, User } from './';
 
 export class ChatMessage extends Message{
-    constructor(from: User, roomName: string, content: string) {
-        super(from, roomName, content);
+    constructor(from: User, roomName: string, content: string, action: number) {
+        super(from, roomName, content, action);
     }
 }

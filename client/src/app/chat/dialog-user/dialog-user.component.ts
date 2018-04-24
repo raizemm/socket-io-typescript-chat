@@ -18,7 +18,6 @@ export class DialogUserComponent implements OnInit {
 	constructor(
 		public dialogRef: MatDialogRef<DialogUserComponent>,
 		@Inject(MAT_DIALOG_DATA) public params: DialogData) {
-		console.log(params)
 		this.previousUsername = params.username ? params.username : undefined;
 	}
 
