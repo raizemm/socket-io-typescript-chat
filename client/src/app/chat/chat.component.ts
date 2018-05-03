@@ -103,6 +103,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 			.subscribe(() => {
 				console.log('disconnected');
 			});
+		this.socketService.onReconnect()
+			.subscribe(() => {
+				this.socketService.newUser(this.user);
+			})
 	}
 
 	private getRandomId(): number {
@@ -155,7 +159,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 				from: this.user,
 				action: action
 			};
-			this.socketService.newUser(this.user)
+			this.socketService.newUser(this.user);
 			this.socketService.send(message);
 		} else if (action === Action.RENAME) {
 			message = {

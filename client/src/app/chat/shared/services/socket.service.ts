@@ -27,6 +27,12 @@ export class SocketService {
 		this.socket.emit('newUser', user);
 	}
 
+	public onReconnect(): Observable<void> {
+		return new Observable<void>(observer => {
+			this.socket.on('reconnect', () => observer.next());
+		})
+	}
+
 	public onMessage(): Observable<Message> {
 		return new Observable<Message>(observer => {
 			this.socket.on('message', (data: Message) => observer.next(data));
@@ -35,6 +41,7 @@ export class SocketService {
 
 	public onEvent(event: Event): Observable<any> {
 		return new Observable<Event>(observer => {
+			console.log(event)
 			this.socket.on(event, () => observer.next(event));
 		});
 	}

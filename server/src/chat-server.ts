@@ -5,9 +5,10 @@ import * as socketIo from 'socket.io';
 import * as logger from 'morgan';
 import * as cookieParser from 'cookie-parser';
 import * as bodyParser from 'body-parser';
+import * as _ from 'lodash';
 
 import { Message, User, ChangeUsername } from './model';
-import { Users } from './sockets';
+import { UsersSocket } from './sockets';
 
 export class ChatServer {
 	public static readonly PORT: number = 8080;
@@ -17,6 +18,7 @@ export class ChatServer {
 	private port: string | number;
 	private usernames: string[] = [];
 	private roomName: string;
+	private roomsCache: { [id: string]: any} = {};
 
 	constructor() {
 		this.createApp();
@@ -56,42 +58,22 @@ export class ChatServer {
 		});
 		this.io.on('connect', (socket: any) => {
 			console.log('Connected client on port %s.', this.port);
-			console.log(socket.request._query)
+
 			socket.on('newUser', (user: User) => {
-				if (this.usernames.indexOf(user.name) !== -1) {
-					return;
-				} else {
-					this.usernames.push(user.name);
-					socket.username = user.name;
-					socket.join(user.roomName);
-					this.io.to(user.roomName).emit('usernames', this.usernames);
+				let roomsSocket = this.roomsCache[user.roomName];
+				if (!roomsSocket) {
+					roomsSocket = new UsersSocket(this.io, user.roomName);
+					this.roomsCache[user.roomName] = roomsSocket;
 				}
-				// const users = new Users(socket, this.io, user.name, user.roomName);
-				// users.addSocket(socket)
+
+				socket.username = user.name;
+				roomsSocket.addSocket(socket)
+
 			});
 
 			socket.on('message', (m: Message) => {
 				console.log('[server](message): %s', JSON.stringify(m));
-
 				this.io.to(m.from.roomName).emit('message', m);
-			});
-			socket.on('changeUsername', (data: ChangeUsername) => {
-				if (data.content.previousUsername === data.from.name) {
-					return;
-				}
-
-				const index = this.usernames.indexOf(data.content.previousUsername);
-				this.usernames.splice(index, 1, data.from.name);
-				socket.username = data.from.name;
-				this.io.to(data.from.roomName).emit('usernames', this.usernames);
-				this.io.to(data.from.roomName).emit('message', data);
-
-			});
-			socket.on('disconnect', () => {
-				const index = this.usernames.indexOf(socket.username);
-				this.usernames.splice(index, 1);
-				this.io.emit('usernames', this.usernames);
-				console.log('Client disconnected');
 			});
 		});
 	}
