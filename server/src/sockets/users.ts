@@ -30,14 +30,13 @@ export class UsersSocket {
 		});
 
 		socket.on('disconnect', () => {
-			console.log(socket.username)
-
 			const socketIndex = _.findIndex(this.sockets, {
 				'socket.id': socket.id,
 			});
 
 			if (socket < 0) {
 				return;
+
 			}
 
 			const userIndex = this.usernames.indexOf(socket.username);

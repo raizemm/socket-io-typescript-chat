@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'tcc-root',
-  templateUrl: 'app.component.html',
-  styleUrls: ['./app.component.css']
+	selector: 'tcc-root',
+	templateUrl: 'app.component.html',
 })
 export class AppComponent implements OnInit {
+	constructor() {
+	}
 
-  ngOnInit(): void {
-  }
+	ngOnInit(): void {
+	}
 
-  private initModel(): void {
-  }
+	private initModel(): void {
+	}
 }

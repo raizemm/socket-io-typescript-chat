@@ -18,12 +18,9 @@ import { SocketService } from './shared/services/socket.service';
 import { DialogParams, DialogUserComponent } from './dialog-user/dialog-user.component';
 import { DialogUserType } from './dialog-user/dialog-user-type';
 
-const AVATAR_URL = 'https://api.adorable.io/avatars/285';
-
 @Component({
 	selector: 'tcc-chat',
 	templateUrl: './chat.component.html',
-	styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 	action = Action;
@@ -79,7 +76,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 		const randomId = this.getRandomId();
 		this.user = {
 			id: randomId,
-			avatar: `${AVATAR_URL}/${randomId}.png`
 		};
 	}
 

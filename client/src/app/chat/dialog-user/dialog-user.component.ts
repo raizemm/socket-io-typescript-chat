@@ -6,7 +6,6 @@ import { DialogUserType } from './dialog-user-type';
 @Component({
 	selector: 'tcc-dialog-user',
 	templateUrl: './dialog-user.component.html',
-	styleUrls: ['./dialog-user.component.css']
 })
 export class DialogUserComponent implements OnInit {
 	form = new FormGroup({
