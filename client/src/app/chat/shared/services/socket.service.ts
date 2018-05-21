@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
 import * as socketIo from 'socket.io-client';
+import { config } from '../config';
 import { Event } from '../model/event';
 import { Message } from '../model/message';
 import { User } from '../model/user';
@@ -9,7 +11,8 @@ const SERVER_URL = 'http://localhost:8080';
 
 @Injectable()
 export class SocketService {
-	private socket;
+	private socket: any;
+	localStream: any;
 
 	public initSocket(): void {
 		this.socket = socketIo(SERVER_URL);
@@ -23,8 +26,44 @@ export class SocketService {
 		this.socket.emit('changeUsername', data);
 	}
 
-	public newUser(user: User):  void {
-		this.socket.emit('newUser', user);
+	public joinChannel(user: User): void {
+		this.socket.emit('join', user);
+	}
+
+	public newPeer(user: User):  void {
+		this.socket.emit('newPeer', user);
+	}
+
+	public onNewPeer(): Observable<any> {
+		return new Observable<any>(observer => {
+			this.socket.on('newPeer', (peer: any) => observer.next(peer));
+		})
+	}
+
+	public emitRelayICECandidate(data: any): void {
+		this.socket.emit('relayICECandidate', {
+			peerId: data.peerId,
+			iceCandidate: data.iceCandidate,
+		})
+	}
+
+	public emitRelaySessionDescription(data: any): void {
+		this.socket.emit('relaySessionDescription', {
+			peerId: data.peerId,
+			sessionDescription: data.sessionDescription,
+		})
+	}
+
+	public onSessionDescription(): Observable<any> {
+		return new Observable<any>(observer => {
+			this.socket.on('sessionDescription', (config: any) => observer.next(config));
+		})
+	}
+
+	public onIceCandidate(): Observable<any> {
+		return new Observable<any>(observer => {
+			this.socket.on('iceCandidate', (config: any) => observer.next(config));
+		})
 	}
 
 	public onReconnect(): Observable<void> {
@@ -41,7 +80,6 @@ export class SocketService {
 
 	public onEvent(event: Event): Observable<any> {
 		return new Observable<Event>(observer => {
-			console.log(event)
 			this.socket.on(event, () => observer.next(event));
 		});
 	}
@@ -50,5 +88,30 @@ export class SocketService {
 		return new Observable<string[]>(observer => {
 			this.socket.on('usernames', (usernames) => observer.next(usernames))
 		})
+	}
+
+	public setup(): Promise<boolean> {
+		console.log("Requesting access to local audio / video inputs");
+		let browserNavigator = <any>navigator;
+		browserNavigator.getUserMedia = ( browserNavigator.getUserMedia ||
+			browserNavigator.webkitGetUserMedia ||
+			browserNavigator.mozGetUserMedia ||
+			browserNavigator.msGetUserMedia);
+
+		return new Promise((resolve, reject) => {
+			browserNavigator.getUserMedia({
+				"audio": config.useAudio,
+				"video": config.useVideo,
+			}, stream => {
+				this.localStream = stream;
+				resolve(true)
+			}, () => {
+				reject(false);
+			});
+		})
+	}
+
+	public getLocalStream(): Observable<MediaStream> {
+		return Observable.of(this.localStream);
 	}
 }

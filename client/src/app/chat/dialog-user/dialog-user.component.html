@@ -7,7 +7,7 @@
 		<mat-hint>Please type your username</mat-hint>
 	</mat-form-field>
 	<mat-form-field *ngIf="params?.dialogType === 'new-user'">
-		<input matInput name="roomName" placeholder="Room name" [(ngModel)]="params.room" formControlName="roomName" required>
+		<input matInput name="channel" placeholder="Room name" [(ngModel)]="params.channel" formControlName="channel" required>
 		<mat-error>This field is required</mat-error>
 		<mat-hint>Please type room name that you want to join</mat-hint>
 	</mat-form-field>

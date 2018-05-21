@@ -15,13 +15,12 @@ gulp.watch('src/**/*.ts', ['build']);
 gulp.task('start', function () {
 	nodemon({
 		script: 'dist/index.js',
-
 	})
 });
 
 gulp.task('default', function(done) {
-	runSequence('build', 'start', function() {
-		console.log('Run something else');
+	runSequence('build', 'start', () => {
+		// console.log('Run something else');
 		done();
 	});
 });

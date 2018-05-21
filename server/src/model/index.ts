@@ -1,3 +1,3 @@
 export { Message } from './message';
 export { ChatMessage } from './chat-message';
-export { User, ChangeUsername } from './user';
+export { Peer, ChangeUsername } from './peer';

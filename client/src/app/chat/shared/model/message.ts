@@ -5,5 +5,6 @@ export interface Message {
     from?: User;
     content?: any;
     action?: Action;
-    roomName?: string;
+    channel?: string;
+    shouldCreateOffer?: boolean;
 }

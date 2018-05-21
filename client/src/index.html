@@ -10,25 +10,28 @@
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<style type="text/css">
 		.spinner {
-			height: 100px;
-			width: 100px;
-			animation: rotate 2s linear infinite;
-			transform-origin: center center;
+			content: '';
+			box-sizing: border-box;
 			position: absolute;
-			top: 50%;
-			bottom: 0;
+			top: 45%;
 			left: 50%;
-			right: 0;
-			/*margin: auto;*/
+			width: 100px;
+			height: 100px;
+			/*margin-top: -10px;*/
+			/*margin-left: -10px;*/
+			border-radius: 50%;
+			border: 2px solid #ccc;
+			border-top-color: #333;
+			animation: rotate .6s linear infinite;
 		}
 
-		.app-loading .spinner .path {
-			stroke-dasharray: 1, 200;
-			stroke-dashoffset: 10%;
-			animation: dash 1.5s ease-in-out infinite;
-			stroke-linecap: round;
-			stroke: #ddd;
-		}
+		/*.app-loading .spinner .path {*/
+			/*stroke-dasharray: 1, 200;*/
+			/*stroke-dashoffset: 10%;*/
+			/*animation: dash 1.5s ease-in-out infinite;*/
+			/*stroke-linecap: round;*/
+			/*stroke: #ddd;*/
+		/*}*/
 
 		@keyframes rotate {
 			100% {
@@ -56,9 +59,10 @@
 <body>
 	<tcc-root>
 		<div class="app-loading">
-			<svg class="spinner" viewBox="25 25 50 50">
-				<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
-			</svg>
+			<div class="spinner"></div>
+			<!--<svg class="spinner" viewBox="25 25 50 50">-->
+				<!--<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>-->
+			<!--</svg>-->
 		</div>
 	</tcc-root>
 

@@ -10,7 +10,7 @@ import { DialogUserType } from './dialog-user-type';
 export class DialogUserComponent implements OnInit {
 	form = new FormGroup({
 		username: new FormControl('', Validators.required),
-		roomName: new FormControl('', Validators.required),
+		channel: new FormControl('', Validators.required),
 	});
 	previousUsername: string;
 
@@ -24,12 +24,14 @@ export class DialogUserComponent implements OnInit {
 	}
 
 	public onSave(): void {
-		this.dialogRef.close({
-			username: this.params.username,
-			roomName: this.params.room,
-			dialogType: this.params.dialogType,
-			previousUsername: this.previousUsername
-		});
+		if (this.params.channel && this.params.username) {
+			this.dialogRef.close({
+				username: this.params.username,
+				channel: this.params.channel,
+				dialogType: this.params.dialogType,
+				previousUsername: this.previousUsername
+			});
+		}
 	}
 }
 
@@ -42,6 +44,6 @@ export interface DialogData {
 	title: string;
 	username?: string;
 	dialogType: DialogUserType;
-	room?: string;
+	channel?: string;
 	previousUsername?: string;
 }

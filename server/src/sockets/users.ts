@@ -5,48 +5,69 @@ export class UsersSocket {
 	io: any;
 	username: string;
 	usernames: string[] = [];
-	roomName: string;
-	sockets: any[] = [];
+	channel: string;
+	sockets: any = {};
+	channels: any = {};
+	socket: any;
 
-	constructor(io: any, roomName: string) {
+	constructor(io: any, channel: string) {
 		this.io = io;
-		this.roomName = roomName;
+		this.channel = channel;
 	}
 
-
 	addSocket(socket: any) {
-		this.sockets.push(socket);
-		if (this.usernames.indexOf(socket.username) !== -1) {
-			return;
-		} else {
-			this.usernames.push(socket.username);
-			socket.join(this.roomName);
-			console.log(this.usernames)
-			this.io.to(this.roomName).emit('usernames', this.usernames);
+		const userData = socket.handshake.session.userData;
+
+		if (!(userData.channel in this.channels)) {
+			this.channels[userData.channel] = {};
 		}
 
-		socket.on('reconnect', () => {
-			// console.log('foo')
-		});
-
-		socket.on('disconnect', () => {
-			const socketIndex = _.findIndex(this.sockets, {
-				'socket.id': socket.id,
+		for (let id in this.channels[userData.channel]) {
+			this.channels[userData.channel][id].emit('newPeer', {
+				peerId: socket.id,
+				shouldCreateOffer: false,
 			});
+			socket.emit('newPeer', {
+				peerId: id,
+				shouldCreateOffer: true,
+			});
+			// this.io.to(this.channel).emit('newPeer', {
+			// 	id: userData.id,
+			// 	shouldCreateOffer: false,
+			// });
+			// socket.emit('newPeer', {
+			// 	id: userData.id,
+			// 	shouldCreateOffer: true,
+			// })
+		}
 
-			if (socket < 0) {
-				return;
+		this.channels[userData.channel][socket.id] = socket;
+		this.sockets[socket.id] = socket;
 
-			}
 
-			const userIndex = this.usernames.indexOf(socket.username);
-			this.usernames.splice(userIndex, 1);
-			this.io.emit('usernames', this.usernames);
+		if (this.usernames.indexOf(userData.name) !== -1) {
+			return;
+		} else {
+			this.usernames.push(userData.name);
+			socket.join(this.channel);
+			this.io.to(this.channel).emit('usernames', this.usernames);
+			// this.io.to(this.channel).emit('newPeer', {
+			// 	peerId: userData.id,
+			// 	shouldCreateOffer: false,
+			// });
+		}
 
-			socket.leave(this.roomName);
-			this.sockets.splice(socketIndex, 1);
-			console.log('Client disconnected');
-		});
+		this.registerHandlers(socket, userData);
+
+
+		// for (socket in this.sockets) {
+		//
+		// 	this.sockets[socket].emit('newPeer', {
+		// 		peerId: userData.id,
+		// 		shouldCreateOffeer: true,
+		// 	})
+		// }
+
 
 		socket.on('changeUsername', (data: ChangeUsername) => {
 			if (data.content.previousUsername === data.from.name) {
@@ -56,8 +77,63 @@ export class UsersSocket {
 			const index = this.usernames.indexOf(data.content.previousUsername);
 			this.usernames.splice(index, 1, data.from.name);
 			socket.username = data.from.name;
-			this.io.to(data.from.roomName).emit('usernames', this.usernames);
-			this.io.to(data.from.roomName).emit('message', data);
+			this.io.to(data.from.channel).emit('usernames', this.usernames);
+			this.io.to(data.from.channel).emit('message', data);
 		});
+
+		socket.on('relayICECandidate', config => {
+			const peerId = config.peerId;
+			const iceCandidate = config.iceCandidate;
+			console.log("["+ socket.id + "] relaying ICE candidate to [" + peerId + "] ", iceCandidate);
+			// this.io.to(this.channel).emit('iceCandidate', {peerId: socket.id, iceCandidate: iceCandidate});
+			if (peerId in this.sockets) {
+				this.sockets[peerId].emit('iceCandidate', {peerId: socket.id, iceCandidate: iceCandidate});
+			}
+		});
+
+		socket.on('relaySessionDescription', config => {
+			const peerId = config.peerId;
+			const sessionDescription = config.sessionDescription;
+			console.log("["+ socket.id + "] relaying session description to [" + peerId + "] ", sessionDescription);
+			// this.io.to(this.channel).emit('sessionDescription', {peerId: socket.id, sessionDescription: sessionDescription});
+			if (peerId in this.sockets) {
+				this.sockets[peerId].emit('sessionDescription', {peerId: socket.id, sessionDescription});
+			}
+		});
+
+	}
+
+	registerHandlers(socket, userData) {
+		socket.on('reconnect', this.reconnectHandler());
+		socket.on('disconnect', this.disconnectHandler(socket));
+	}
+
+	private disconnectHandler(socket) {
+		return () => {
+			const userData = socket.handshake.session.userData;
+
+			delete this.sockets[userData.channel][userData.id];
+			//
+			// const socketIndex = _.findIndex(this.sockets, {
+			// 	'socket.id': socket.id,
+			// });
+			//
+			// if (socket < 0) {
+			// 	return;
+			//
+			// }
+			//
+			// const userIndex = this.usernames.indexOf(socket.username);
+			// this.usernames.splice(userIndex, 1);
+			// this.io.emit('usernames', this.usernames);
+			//
+			// socket.leave(this.channel);
+			// this.sockets.splice(socketIndex, 1);
+			// console.log('Client disconnected');
+		}
+	}
+
+	private reconnectHandler() {
+		return () => {};
 	}
 }

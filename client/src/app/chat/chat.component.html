@@ -1,43 +1,51 @@
-<button mat-fab (click)="onClickUserInfo()">
+<button mat-fab class="user-info" (click)="onClickUserInfo()">
 	<mat-icon>person</mat-icon>
 </button>
-<div class="chat-container">
-	<mat-card class="main-card">
-		<mat-list class="chat-list">
-			<mat-list-item *ngFor="let message of messages" [ngClass]="[(message.action === undefined && message.from.id === user.id) ? 'chat-list-item': '']">
-				<h4 mat-line *ngIf="message.action === undefined">
-					<b>{{message.from.name}}</b>
-				</h4>
-				<p mat-line *ngIf="message.action === undefined">
-					<span> {{message.content}} </span>
-				</p>
-				<p mat-line *ngIf="message.action === action.JOINED" class="chat-notification">
-					<span> <b>{{message.from.name}}</b> joined to the conversation. </span>
-				</p>
-				<p mat-line *ngIf="message.action === action.RENAME" class="chat-notification">
-					<span> <b>{{message.content.previousUsername}}</b> is now <b>{{message.from.name}}</b> </span>
-				</p>
+<button mat-fab class="chat-toggle" (click)="toggleChat()">
+	<mat-icon>group</mat-icon>
+</button>
+<div *ngIf="showChat" [@slideInOut]>
+	<div class="users-container">
+		<mat-card class="main-card" *ngIf="usernames && usernames.length">
+			<span>Users in room: <b>{{user.channel}}</b></span>
+			<mat-list-item *ngFor="let user of usernames">
+				<p>{{user}}</p>
 			</mat-list-item>
-		</mat-list>
-		<div class="chat-footer-container">
-			<mat-icon>message</mat-icon>
-			<mat-form-field class="chat-input">
-				<input matInput
-					#inputMessage
-					maxlength="140"
-					placeholder="Type your message"
-					[(ngModel)]="messageContent"
-					(keyup.enter)="sendMessage(messageContent)">
-				<mat-hint align="end">{{inputMessage.value.length}}/140</mat-hint>
-			</mat-form-field>
-		</div>
-	</mat-card>
+		</mat-card>
+	</div>
+	<div class="chat-container">
+		<mat-card class="main-card">
+			<mat-list class="chat-list">
+				<mat-list-item *ngFor="let message of messages" [ngClass]="[(message.action === undefined && message.from.id === user.id) ? 'chat-list-item': '']">
+					<h4 mat-line *ngIf="message.action === undefined">
+						<b>{{message.from.name}}</b>
+					</h4>
+					<p mat-line *ngIf="message.action === undefined">
+						<span> {{message.content}} </span>
+					</p>
+					<p mat-line *ngIf="message.action === action.JOINED" class="chat-notification">
+						<span> <b>{{message.from.name}}</b> joined to the conversation. </span>
+					</p>
+					<p mat-line *ngIf="message.action === action.RENAME" class="chat-notification">
+						<span> <b>{{message.content.previousUsername}}</b> is now <b>{{message.from.name}}</b> </span>
+					</p>
+				</mat-list-item>
+			</mat-list>
+			<div class="chat-footer-container">
+				<mat-icon>message</mat-icon>
+				<mat-form-field class="chat-input">
+					<input matInput
+						   #inputMessage
+						   maxlength="140"
+						   placeholder="Type your message"
+						   [(ngModel)]="messageContent"
+						   (keyup.enter)="sendMessage(messageContent)">
+					<mat-hint align="end">{{inputMessage.value.length}}/140</mat-hint>
+				</mat-form-field>
+			</div>
+		</mat-card>
+	</div>
 </div>
-<div class="users-container">
-	<mat-card class="main-card" *ngIf="usernames && usernames.length">
-		Users in room:
-		<mat-list-item *ngFor="let user of usernames">
-			<p>{{user}}</p>
-		</mat-list-item>
-	</mat-card>
+<div class="users-streams" #streamContainer [class.empty]="!stream">
+	<!--<video class="video-stream"  type="video/mp4"></video>-->
 </div>
