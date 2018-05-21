@@ -150,17 +150,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 				};
 
 				peerConnection.onaddstream = event => {
-					console.log("onAddStream", event);
-					// var remote_media = USE_VIDEO ? $("<video>") : $("<audio>");
-					// remote_media.attr("autoplay", "autoplay");
-					// if (MUTE_AUDIO_BY_DEFAULT) {
-					// 	remote_media.attr("muted", "true");
-					// }
-					// remote_media.attr("controls", "");
-					// peer_media_elements[peer_id] = remote_media;
-					// $('body').append(remote_media);
 					this.createStreamElement(this.streamContainer.nativeElement, event.stream);
 				};
+
 				/* Add our local stream */
 				peerConnection.addStream(this.stream);
 

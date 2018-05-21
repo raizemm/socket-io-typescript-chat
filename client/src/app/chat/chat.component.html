@@ -29,6 +29,9 @@
 					<p mat-line *ngIf="message.action === action.RENAME" class="chat-notification">
 						<span> <b>{{message.content.previousUsername}}</b> is now <b>{{message.from.name}}</b> </span>
 					</p>
+					<p mat-line *ngIf="message.action === action.LEFT" class="chat-notification">
+						<span> <b>{{message.from.name}}</b> left the conversation </span>
+					</p>
 				</mat-list-item>
 			</mat-list>
 			<div class="chat-footer-container">

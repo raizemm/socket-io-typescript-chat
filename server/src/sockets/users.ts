@@ -31,14 +31,6 @@ export class UsersSocket {
 				peerId: id,
 				shouldCreateOffer: true,
 			});
-			// this.io.to(this.channel).emit('newPeer', {
-			// 	id: userData.id,
-			// 	shouldCreateOffer: false,
-			// });
-			// socket.emit('newPeer', {
-			// 	id: userData.id,
-			// 	shouldCreateOffer: true,
-			// })
 		}
 
 		this.channels[userData.channel][socket.id] = socket;
@@ -51,35 +43,9 @@ export class UsersSocket {
 			this.usernames.push(userData.name);
 			socket.join(this.channel);
 			this.io.to(this.channel).emit('usernames', this.usernames);
-			// this.io.to(this.channel).emit('newPeer', {
-			// 	peerId: userData.id,
-			// 	shouldCreateOffer: false,
-			// });
 		}
 
 		this.registerHandlers(socket, userData);
-
-
-		// for (socket in this.sockets) {
-		//
-		// 	this.sockets[socket].emit('newPeer', {
-		// 		peerId: userData.id,
-		// 		shouldCreateOffeer: true,
-		// 	})
-		// }
-
-
-		socket.on('changeUsername', (data: ChangeUsername) => {
-			if (data.content.previousUsername === data.from.name) {
-				return;
-			}
-
-			const index = this.usernames.indexOf(data.content.previousUsername);
-			this.usernames.splice(index, 1, data.from.name);
-			socket.username = data.from.name;
-			this.io.to(data.from.channel).emit('usernames', this.usernames);
-			this.io.to(data.from.channel).emit('message', data);
-		});
 
 		socket.on('relayICECandidate', config => {
 			const peerId = config.peerId;
@@ -106,34 +72,67 @@ export class UsersSocket {
 	registerHandlers(socket, userData) {
 		socket.on('reconnect', this.reconnectHandler());
 		socket.on('disconnect', this.disconnectHandler(socket));
+		socket.on('changeUsername', data => this.changeUsernameHandler(data));
+	}
+
+	private changeUsernameHandler(data: ChangeUsername) {
+		if (data.content.previousUsername === data.from.name) {
+			return;
+		}
+
+		const index = this.usernames.indexOf(data.content.previousUsername);
+		this.usernames.splice(index, 1, data.from.name);
+		// socket.username = data.from.name;
+		this.io.to(data.from.channel).emit('usernames', this.usernames);
+		this.io.to(data.from.channel).emit('message', data);
 	}
 
 	private disconnectHandler(socket) {
 		return () => {
 			const userData = socket.handshake.session.userData;
 
-			delete this.sockets[userData.channel][userData.id];
-			//
-			// const socketIndex = _.findIndex(this.sockets, {
-			// 	'socket.id': socket.id,
-			// });
-			//
-			// if (socket < 0) {
-			// 	return;
-			//
-			// }
-			//
-			// const userIndex = this.usernames.indexOf(socket.username);
-			// this.usernames.splice(userIndex, 1);
-			// this.io.emit('usernames', this.usernames);
-			//
+			for (const channel of this.channels) {
+				this.leaveChannel(channel, socket);
+			}
+			delete this.sockets[socket.id];
+
+			const socketIndex = _.findIndex(this.sockets, {
+				[socket.id]: socket.id,
+			});
+
+			if (socket < 0) {
+				return;
+			}
+
+			const userIndex = this.usernames.indexOf(userData.name);
+			this.usernames.splice(userIndex, 1);
+			this.io.emit('usernames', this.usernames);
+			this.io.to(userData.channel).emit('message', {
+				from: {
+					id: userData.id,
+					name: userData.name,
+				},
+				action: 1,
+			});
 			// socket.leave(this.channel);
 			// this.sockets.splice(socketIndex, 1);
-			// console.log('Client disconnected');
+			console.log('Client disconnected');
 		}
 	}
 
 	private reconnectHandler() {
 		return () => {};
+	}
+
+	private leaveChannel(channel: string, socket: any) {
+
+		if (!(channel in socket.rooms)) {
+			console.error(`${socket.id} ERROR: not in,`, channel);
+			return;
+		}
+
+		socket.leave(channel);
+		// delete socket.rooms[channel];
+		delete this.channels[channel][socket.id];
 	}
 }

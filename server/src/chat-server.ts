@@ -15,8 +15,6 @@ export class ChatServer {
 	private server: Server;
 	private io: SocketIO.Server;
 	private port: string | number;
-	private usernames: string[] = [];
-	private roomName: string;
 	private roomsCache: { [id: string]: any} = {};
 	private expressSession = session({
 		secret: 'secret',
@@ -71,10 +69,6 @@ export class ChatServer {
 			console.log('Connected client on port %s.', this.port);
 
 			socket.on('join', (peer: Peer) => {
-
-
-
-				// TODO improve later
 				let roomsSocket = this.roomsCache[peer.channel];
 				if (!roomsSocket) {
 					roomsSocket = new UsersSocket(this.io, peer.channel);
@@ -82,34 +76,9 @@ export class ChatServer {
 				}
 				socket.handshake.session.userData = peer;
 				socket.handshake.session.save();
-				// socket.emit('newPeer', {
-				// 	peerId: peer.id,
-				// 	shouldCreateOffeer: true,
-				// });
-				// socket.username = peer.name;
+
 				roomsSocket.addSocket(socket)
-
 			});
-
-			// socket.on('relayICECandidate', config => {
-			// 	const peerId = config.peerId;
-			// 	const iceCandidate = config.iceCandidate;
-			// 	console.log("["+ socket.id + "] relaying ICE candidate to [" + peerId + "] ", iceCandidate);
-			// 	// this.io.to(this.channel).emit('iceCandidate', {peerId: userData.id, iceCandidate: iceCandidate});
-			// 	if (peerId in this.sockets) {
-			// 		this.sockets[peerId].emit('iceCandidate', {peerId: socket.id, iceCandidate: iceCandidate});
-			// 	}
-			// });
-			//
-			// socket.on('relaySessionDescription', config => {
-			// 	const peerId = config.peerId;
-			// 	const sessionDescription = config.sessionDescription;
-			// 	console.log("["+ socket.id + "] relaying session description to [" + peerId + "] ", sessionDescription);
-			// 	// this.io.to(this.channel).emit('sessionDescription', {peerId: userData.id, sessionDescription: sessionDescription});
-			// 	if (peerId in this.sockets) {
-			// 		this.sockets[peerId].emit('sessionDescription', {peerId: socket.id, sessionDescription: sessionDescription});
-			// 	}
-			// });
 
 			socket.on('message', (m: Message) => {
 				console.log('[server](message): %s', JSON.stringify(m));
