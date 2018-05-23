@@ -9,48 +9,42 @@
 	<link rel="icon" type="image/x-icon" href="favicon.ico">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<style type="text/css">
-		.spinner {
-			content: '';
-			box-sizing: border-box;
+		.spinner,
+		.spinner::before,
+		.spinner::after {
 			position: absolute;
+			border-radius: 750px;
 			top: 45%;
 			left: 50%;
-			width: 100px;
-			height: 100px;
-			/*margin-top: -10px;*/
-			/*margin-left: -10px;*/
-			border-radius: 50%;
 			border: 2px solid #ccc;
-			border-top-color: #333;
+			border-left-color: #333;
+		}
+		.spinner {
+			width: 37px;
+			height: 37px;
+			margin: -19px 0 0 -19px;
 			animation: rotate .6s linear infinite;
 		}
 
-		/*.app-loading .spinner .path {*/
-			/*stroke-dasharray: 1, 200;*/
-			/*stroke-dashoffset: 10%;*/
-			/*animation: dash 1.5s ease-in-out infinite;*/
-			/*stroke-linecap: round;*/
-			/*stroke: #ddd;*/
+		/*.spinner::before {*/
+			/*content: '';*/
+			/*width: 33px;*/
+			/*height: 33px;*/
+			/*margin: -17px 0 0 -17px;*/
+			/*animation: rotate 1150ms linear infinite;*/
+		/*}*/
+
+		/*.spinner::after {*/
+			/*content: '';*/
+			/*width: 42px;*/
+			/*height: 42px;*/
+			/*margin: -22px 0 0 -22px;*/
+			/*animation: rotate 1800ms linear infinite;*/
 		/*}*/
 
 		@keyframes rotate {
 			100% {
 				transform: rotate(360deg);
-			}
-		}
-
-		@keyframes dash {
-			0% {
-				stroke-dasharray: 1, 200;
-				stroke-dashoffset: 0;
-			}
-			50% {
-				stroke-dasharray: 89, 200;
-				stroke-dashoffset: -35px;
-			}
-			100% {
-				stroke-dasharray: 89, 200;
-				stroke-dashoffset: -124px;
 			}
 		}
 
@@ -60,9 +54,6 @@
 	<tcc-root>
 		<div class="app-loading">
 			<div class="spinner"></div>
-			<!--<svg class="spinner" viewBox="25 25 50 50">-->
-				<!--<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>-->
-			<!--</svg>-->
 		</div>
 	</tcc-root>
 

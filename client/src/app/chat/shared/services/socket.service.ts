@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import * as socketIo from 'socket.io-client';
+import { environment } from '../../../../environments/environment';
 import { config } from '../config';
 import { Event } from '../model/event';
 import { Message } from '../model/message';
 import { User } from '../model/user';
 
-const SERVER_URL = 'http://localhost:8080';
+const SERVER_URL = environment.socketUrl;
 
 @Injectable()
 export class SocketService {
