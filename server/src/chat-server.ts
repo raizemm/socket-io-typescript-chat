@@ -47,6 +47,13 @@ export class ChatServer {
 		this.app.use(bodyParser.urlencoded({extended: false}));
 		this.app.use(cookieParser());
 		this.app.use(this.expressSession);
+		this.app.use((req, res, next) => {
+			res.header("Access-Control-Allow-Origin", "*");
+			res.header("Access-Control-Allow-Headers", "X-Requested-With");
+			res.header("Access-Control-Allow-Headers", "Content-Type");
+			res.header("Access-Control-Allow-Methods", "PUT, GET, POST, DELETE, OPTIONS");
+			next();
+		});
 	}
 
 	private config(): void {
@@ -54,7 +61,7 @@ export class ChatServer {
 	}
 
 	private initSocket(): void {
-		this.io = socketIo(this.server);
+		this.io = socketIo(this.server, {origins: '*:*'});
 		this.io.use(sharedSession(this.expressSession));
 	}
 
