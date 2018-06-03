@@ -1,11 +1,15 @@
 {
-  "files": [
-    "src/*.ts",
-    "src/model/*.ts",
-    "src/sockets/*.ts"
-  ],
-  "compilerOptions": {
-    "noImplicitAny": true,
-    "target": "es5"
-  }
+	"files": [
+		"src/*.ts",
+		"src/model/*.ts",
+		"src/sockets/*.ts"
+	],
+	"compilerOptions": {
+		"noImplicitAny": true,
+		"target": "es5",
+		"types": [],
+		"typeRoots": [
+			"node_modules/@types"
+		]
+	}
 }

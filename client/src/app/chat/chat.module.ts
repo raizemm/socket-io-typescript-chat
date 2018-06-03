@@ -1,22 +1,24 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
+import { DialogNewRoomComponent } from '../shared/dialog/new-room/dialog-new-room.component';
+import { DialogNewUserComponent } from '../shared/dialog/new-user/dialog-new-user.component';
+import { ChatGuard } from '../shared/guards/chat.guard';
 import { MaterialModule } from '../shared/material/material.module';
-
+import { ChatRoutingModule } from './chat-routing.module';
 import { ChatComponent } from './chat.component';
-import { SocketService } from './shared/services/socket.service';
-import { DialogUserComponent } from './dialog-user/dialog-user.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MaterialModule
-  ],
-  declarations: [ChatComponent, DialogUserComponent],
-  providers: [SocketService],
-  entryComponents: [DialogUserComponent]
+	imports: [
+		CommonModule,
+		FormsModule,
+		ReactiveFormsModule,
+		MaterialModule,
+		ChatRoutingModule,
+	],
+	declarations: [ChatComponent, DialogNewRoomComponent, DialogNewUserComponent],
+	providers: [ChatGuard],
+	entryComponents: [DialogNewUserComponent, DialogNewRoomComponent]
 })
-export class ChatModule { }
+export class ChatModule {
+}

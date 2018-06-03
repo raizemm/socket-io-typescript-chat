@@ -1,5 +1,5 @@
 export interface User {
-    id?: number;
+    id: number;
     name?: string;
     avatar?: string;
     channel?: string;

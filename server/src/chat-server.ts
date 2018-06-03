@@ -74,7 +74,6 @@ export class ChatServer {
 			this.sockets[socket.id] = socket;
 
 			console.log('Connected client on port %s.', this.port);
-
 			socket.on('join', (peer: Peer) => {
 				let roomsSocket = this.roomsCache[peer.channel];
 				if (!roomsSocket) {
@@ -84,6 +83,7 @@ export class ChatServer {
 				socket.handshake.session.userData = peer;
 				socket.handshake.session.save();
 
+				socket.emit('join', socket.handshake.session.userData);
 				roomsSocket.addSocket(socket)
 			});
 

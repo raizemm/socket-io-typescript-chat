@@ -11,9 +11,10 @@ import {
 	ViewChildren
 } from '@angular/core';
 import { MatDialog, MatDialogRef, MatList, MatListItem, MatSnackBar } from '@angular/material';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
-import { DialogUserType } from './dialog-user/dialog-user-type';
-import { DialogParams, DialogUserComponent } from './dialog-user/dialog-user.component';
+import { DialogNewUserComponent, DialogParams } from '../shared/dialog/new-user/dialog-new-user.component';
+import { DialogUserType } from '../shared/dialog/new-user/dialog-user-type';
 import { Action } from './shared/model/action';
 import { Event } from './shared/model/event';
 import { Message } from './shared/model/message';
@@ -36,6 +37,12 @@ export const ICE_SERVERS = [
 			transition(':leave', [
 				animate('700ms ease-in', style({margin: '0 0 0 -1500px'}))
 			])
+		]),
+		trigger('appear', [
+			transition(':enter', [
+				style({margin: '0 0 0 -1000px'}),
+				animate('0.5s', style({margin: 0}))
+			])
 		])
 	]
 })
@@ -50,19 +57,15 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 	messageContent: string;
 	showChat: boolean = false;
 	ioConnection: Subscription = Subscription.EMPTY;
-	dialogRef: MatDialogRef<DialogUserComponent> | null;
-	defaultDialogUserParams: DialogParams = {
-		disableClose: true,
-		data: {
-			title: 'Welcome',
-			dialogType: DialogUserType.NEW
-		}
-	};
-	stream: MediaStream;
+	dialogRef: MatDialogRef<DialogNewUserComponent> | null;
+
+	stream: MediaStream = null;
 	// getting a reference to the overall list, which is the parent container of the list items
-	@ViewChild(MatList, {read: ElementRef}) matList: ElementRef;
+	@ViewChild(MatList, {read: ElementRef})
+	matList: ElementRef;
 	// getting a reference to the items/messages within the list
-	@ViewChildren(MatListItem, {read: ElementRef}) matListItems: QueryList<MatListItem>;
+	@ViewChildren(MatListItem, {read: ElementRef})
+	matListItems: QueryList<MatListItem>;
 
 	@ViewChild('streamContainer')
 	streamContainer: ElementRef;
@@ -71,22 +74,21 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 		private socketService: SocketService,
 		public dialog: MatDialog,
 		public snackBar: MatSnackBar,
-		private renderer: Renderer2) {
+		private renderer: Renderer2,
+		private router: Router) {
 	}
 
 	ngOnInit(): void {
-		this.initModel();
-		// Using timeout due to https://github.com/angular/angular/issues/14748
-		// setTimeout(() => {
-		this.socketService.setup().then(() => {
-			this.openUserPopup(this.defaultDialogUserParams);
-		}, () => {
-			this.snackBar.open('Please grant access to your camera');
-		});
-		// }, 0);
+		// this.initModel();
+		this.initIoConnection();
+		if (!this.socketService.localStream) {
+			this.router.navigateByUrl('/user')
+		}
+
 	}
 
 	ngAfterViewInit(): void {
+
 		// subscribing to any changes in the list of items / messages
 		this.matListItems.changes.subscribe(elements => {
 			this.scrollToBottom();
@@ -106,20 +108,24 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 		}
 	}
 
-	private initModel(): void {
-		const randomId = this.getRandomId();
-		this.user = {
-			id: randomId,
-		};
-	}
+	// private initModel(): void {
+	// 	const randomId = this.getRandomId();
+	// 	this.user = {
+	// 		id: randomId,
+	// 	};
+	// }
 
 	private initIoConnection(): void {
-		this.socketService.initSocket();
-
 		this.socketService.getLocalStream().subscribe(stream => {
 			this.stream = stream;
 			this.createStreamElement(this.streamContainer.nativeElement, stream);
 		});
+
+		this.socketService.onJoinChannel()
+			.subscribe(user => {
+				console.log(user)
+				this.user = user;
+			})
 
 		this.ioConnection = this.socketService.onMessage()
 			.subscribe((message: Message) => {
@@ -176,8 +182,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 				}
 		});
 
-		this.socketService.onSessionDescription()
-			.subscribe((config: any) => {
+		this.socketService.onSessionDescription().subscribe((config: any) => {
 			console.log('Remote description received: ', config);
 			const peerId = config.peerId;
 			const peer = this.peers[peerId];
@@ -214,8 +219,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 			console.log("Description Object: ", desc);
 		});
 
-		this.socketService.onIceCandidate()
-			.subscribe((config: any) => {
+		this.socketService.onIceCandidate().subscribe((config: any) => {
 				const peer = this.peers[config.peerId];
 				const iceCandidate = config.iceCandidate;
 				peer.addIceCandidate(new RTCIceCandidate(iceCandidate));
@@ -255,18 +259,18 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	private openUserPopup(params: DialogParams): void {
-		this.dialogRef = this.dialog.open(DialogUserComponent, params);
+		this.dialogRef = this.dialog.open(DialogNewUserComponent, params);
 		this.dialogRef.afterClosed().subscribe(paramsDialog => {
 			if (!paramsDialog) {
 				return;
 			}
-			this.user.name = paramsDialog.username;
-			this.user.channel = paramsDialog.channel;
+			// this.user.name = paramsDialog.username;
+			// this.user.channel = paramsDialog.channel;
 			if (paramsDialog.dialogType === DialogUserType.NEW) {
 				this.initIoConnection();
-				this.sendNotification(paramsDialog, Action.JOINED);
+				this.sendJoinNotification(paramsDialog, Action.JOINED);
 			} else if (paramsDialog.dialogType === DialogUserType.EDIT) {
-				this.sendNotification(paramsDialog, Action.RENAME);
+				this.sendRenameNotification(paramsDialog, Action.RENAME);
 			}
 		});
 	}
@@ -282,29 +286,28 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.messageContent = null;
 	}
 
-	public sendNotification(params: any, action: Action): void {
-		let message: Message;
-		if (action === Action.JOINED) {
-			message = {
-				from: this.user,
-				action: action,
-			};
-			this.socketService.joinChannel(this.user);
-			this.socketService.send(message);
-		} else if (action === Action.RENAME) {
-			message = {
+	public sendJoinNotification(params: any, action: Action): void {
+		const message: Message = {
+			from: this.user,
+			action: action,
+		};
+		this.socketService.joinChannel(this.user);
+		this.socketService.send(message);
+	}
+
+	public sendRenameNotification(params: any, action: Action): void {
+		const message: Message = {
 				from: this.user,
 				action: action,
 				content: {
 					previousUsername: params.previousUsername
 				}
 			};
-			this.socketService.changeUsername(message);
-		}
+		this.socketService.changeUsername(message);
 	}
 
 	private createStreamElement(element, stream): void {
-		const videoElement = this.renderer.createElement('video')
+		const videoElement = this.renderer.createElement('video');
 		this.renderer.setProperty(videoElement, 'type', 'video/mp4');
 		this.renderer.setProperty(videoElement, 'autoplay', 'true');
 		videoElement.srcObject = stream;

@@ -70,6 +70,7 @@ var ChatServer = /** @class */ (function () {
                 }
                 socket.handshake.session.userData = peer;
                 socket.handshake.session.save();
+                socket.emit('join', socket.handshake.session.userData);
                 roomsSocket.addSocket(socket);
             });
             socket.on('message', function (m) {

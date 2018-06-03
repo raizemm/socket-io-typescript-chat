@@ -1,7 +1,8 @@
-import { Message, User } from './';
+import { Message } from './message';
+import { Peer } from './peer';
 
 export class ChatMessage extends Message{
-    constructor(from: User, roomName: string, content: string, action: number) {
+    constructor(from: Peer, roomName: string, content: string, action: number) {
         super(from, roomName, content, action);
     }
 }

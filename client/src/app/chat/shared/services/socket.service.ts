@@ -31,6 +31,12 @@ export class SocketService {
 		this.socket.emit('join', user);
 	}
 
+	public onJoinChannel(): Observable<any> {
+		return new Observable<any>(observer => {
+			this.socket.on('join', (user: User) => observer.next(user));
+		})
+	}
+
 	public newPeer(user: User):  void {
 		this.socket.emit('newPeer', user);
 	}
@@ -101,8 +107,8 @@ export class SocketService {
 
 		return new Promise((resolve, reject) => {
 			browserNavigator.getUserMedia({
-				"audio": config.useAudio,
-				"video": config.useVideo,
+				audio: config.useAudio,
+				video: config.useVideo,
 			}, stream => {
 				this.localStream = stream;
 				resolve(true)
