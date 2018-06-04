@@ -304,7 +304,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	private createStreamElement(element, stream): void {
-		const videoElement = this.renderer.createElement('video')
+		const videoElement = this.renderer.createElement('video');
 		this.renderer.setProperty(videoElement, 'type', 'video/mp4');
 		this.renderer.setProperty(videoElement, 'autoplay', 'true');
 		videoElement.srcObject = stream;
