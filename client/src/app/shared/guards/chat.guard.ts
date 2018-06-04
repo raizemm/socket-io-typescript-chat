@@ -18,14 +18,15 @@ export class ChatGuard implements CanActivate, Resolve<MediaStream>, CanLoad {
 	constructor(private socketService: SocketService, private router: Router) {
 	}
 
-	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
 		console.log('guard')
-		if (!this.socketService.localStream) {
-			this.router.navigateByUrl('/main/user');
-			console.log('bar')
-
-			return false;
-		}
+		this.socketService.localStream = null;
+		// if (!this.socketService.localStream) {
+		// 	this.router.navigateByUrl('/main');
+		// 	console.log('bar')
+		//
+		// 	return false;
+		// }
 		return true;
 	}
 

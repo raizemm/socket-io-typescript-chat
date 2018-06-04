@@ -7,7 +7,7 @@ import { User } from '../../chat/shared/model/user';
 import { SocketService } from '../../chat/shared/services/socket.service';
 import { DialogNewUserComponent, DialogParams } from '../../shared/dialog/new-user/dialog-new-user.component';
 import { DialogUserType } from '../../shared/dialog/new-user/dialog-user-type';
-import { UserDataResolver } from '../../shared/resolvers/user-data-resolver';
+import { UserData, UserDataResolver } from '../../shared/resolvers/user-data-resolver';
 
 
 @Component({
@@ -15,12 +15,13 @@ import { UserDataResolver } from '../../shared/resolvers/user-data-resolver';
 	templateUrl: 'user.template.html'
 })
 export class UserComponent implements OnInit, AfterViewInit {
-
+	model: UserData;
 	defaultDialogUserParams: DialogParams = {
 		disableClose: true,
 		data: {
 			title: 'Welcome',
-			dialogType: DialogUserType.NEW
+			dialogType: DialogUserType.NEW,
+			// username: '',
 		}
 	};
 	dialogRef: MatDialogRef<DialogNewUserComponent> | null;
@@ -28,14 +29,17 @@ export class UserComponent implements OnInit, AfterViewInit {
 	constructor(
 		public dialog: MatDialog,
 		private socketService: SocketService,
-		public snackBar: MatSnackBar,
 		private router: Router,
 		private userDataResolver: UserDataResolver) {
 	}
 
 	ngOnInit() {
-		this.socketService.localStream = null;
-		// this.socketService.initSocket();
+		this.model = this.userDataResolver.create(() => ({
+			id: Math.floor(Math.random() * (1000000)) + 1,
+			username: '',
+			channel: '',
+		}));
+		this.defaultDialogUserParams.data.username = this.model.username;
 	}
 
 	ngAfterViewInit(): void {
@@ -46,21 +50,18 @@ export class UserComponent implements OnInit, AfterViewInit {
 						return;
 					}
 
-					const user: User = {
-						id: Math.floor(Math.random() * (1000000)) + 1,
-						name: paramsDialog.username,
-						// channel: paramsDialog.channel,
-					};
-					const message: Message = {
-						from: user,
-						action: Action.JOINED,
-					};
+					// const user: User = {
+					// 	id: Math.floor(Math.random() * (1000000)) + 1,
+					// 	name: paramsDialog.username,
+					// 	// channel: paramsDialog.channel,
+					// };
+					// const message: Message = {
+					// 	from: user,
+					// 	action: Action.JOINED,
+					// };
 					// this.socketService.joinChannel(user);
 					// this.socketService.send(message);
-					this.userDataResolver.create(() => ({
-						id: user.id,
-						username: user.name,
-					}));
+					this.model.username = paramsDialog.username;
 					this.router.navigate(['main', 'room']);
 				}
 			);

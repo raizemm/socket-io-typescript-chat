@@ -264,8 +264,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 			if (!paramsDialog) {
 				return;
 			}
-			// this.user.name = paramsDialog.username;
-			// this.user.channel = paramsDialog.channel;
+
 			if (paramsDialog.dialogType === DialogUserType.NEW) {
 				this.initIoConnection();
 				this.sendJoinNotification(paramsDialog, Action.JOINED);
