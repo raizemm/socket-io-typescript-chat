@@ -1,7 +1,7 @@
-<h2 mat-dialog-title>{{params.title}}</h2>
+<h2 mat-dialog-title>Please enter your room name</h2>
 
 <mat-dialog-content [formGroup]="form" (keyup.enter)="onSave()">
-	<mat-form-field *ngIf="params?.dialogType === 'new-user'">
+	<mat-form-field>
 		<input matInput name="channel" placeholder="Room name" [(ngModel)]="params.channel" formControlName="channel" required>
 		<mat-error>This field is required</mat-error>
 		<mat-hint>Please type room name that you want to join</mat-hint>
@@ -9,11 +9,11 @@
 </mat-dialog-content>
 
 
-<mat-dialog-actions *ngIf="params?.dialogType === 'new-user'" [attr.align]="'end'">
-	<button mat-raised-button color="primary" class="button" mat-dialog-close (click)="onSave()" [disabled]="form.invalid">Chat!</button>
-</mat-dialog-actions>
+<!--<mat-dialog-actions *ngIf="params?.dialogType === 'new-user'" [attr.align]="'end'">-->
+	<!--<button mat-raised-button color="primary" class="button" mat-dialog-close (click)="onSave()" [disabled]="form.invalid">Chat!</button>-->
+<!--</mat-dialog-actions>-->
 
-<mat-dialog-actions *ngIf="params?.dialogType === 'edit-user'" [attr.align]="'end'">
-	<button mat-button mat-dialog-close class="button" color="secondary">Close</button>
-	<button mat-raised-button color="primary" class="button" mat-dialog-close (click)="onSave()">Save</button>
-</mat-dialog-actions>
+<!--<mat-dialog-actions *ngIf="params?.dialogType === 'edit-user'" [attr.align]="'end'">-->
+	<!--<button mat-button mat-dialog-close class="button" color="secondary">Close</button>-->
+	<!--<button mat-raised-button color="primary" class="button" mat-dialog-close (click)="onSave()">Save</button>-->
+<!--</mat-dialog-actions>-->

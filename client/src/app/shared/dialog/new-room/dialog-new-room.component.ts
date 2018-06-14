@@ -16,6 +16,7 @@ export class DialogNewRoomComponent implements OnInit {
 	constructor(
 		public dialogRef: MatDialogRef<DialogNewRoomComponent>,
 		@Inject(MAT_DIALOG_DATA) public params: DialogData) {
+		console.log(this.params)
 		// this.previousUsername = params.username ? params.username : undefined;
 	}
 
@@ -26,7 +27,6 @@ export class DialogNewRoomComponent implements OnInit {
 		if (this.params.channel) {
 			this.dialogRef.close({
 				channel: this.params.channel,
-				dialogType: this.params.dialogType,
 			});
 		}
 	}
@@ -40,7 +40,7 @@ export interface DialogParams {
 export interface DialogData {
 	title: string;
 	username?: string;
-	dialogType: DialogUserType;
+	dialogType?: DialogUserType;
 	channel?: string;
 	previousUsername?: string;
 }

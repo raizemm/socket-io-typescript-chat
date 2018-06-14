@@ -7,7 +7,7 @@ import { User } from '../../chat/shared/model/user';
 import { SocketService } from '../../chat/shared/services/socket.service';
 import { DialogNewUserComponent, DialogParams } from '../../shared/dialog/new-user/dialog-new-user.component';
 import { DialogUserType } from '../../shared/dialog/new-user/dialog-user-type';
-import { UserData, UserDataResolver } from '../../shared/resolvers/user-data-resolver';
+import { UserData, UserDataModelResolver } from '../../shared/resolvers/user-data-model-resolver';
 
 
 @Component({
@@ -30,8 +30,7 @@ export class UserComponent implements OnInit, AfterViewInit {
 		public dialog: MatDialog,
 		private socketService: SocketService,
 		private router: Router,
-		private userDataResolver: UserDataResolver) {
-	}
+		private userDataResolver: UserDataModelResolver<UserData>) {}
 
 	ngOnInit() {
 		this.model = this.userDataResolver.create(() => ({

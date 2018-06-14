@@ -7,9 +7,7 @@ import { ChatModule } from './chat/chat.module';
 import { LoginComponent } from './login/login.component';
 import { RoomComponent } from './login/room/room.component';
 import { UserComponent } from './login/user/user.component';
-import { ChatGuard } from './shared/guards/chat.guard';
-import { RoomGuard } from './shared/guards/room.guard';
-import { UserDataResolver } from './shared/resolvers/user-data-resolver';
+import { UserDataModelResolver } from './shared/resolvers/user-data-model-resolver';
 import { SharedModule } from './shared/shared.module';
 
 @NgModule({
@@ -27,7 +25,7 @@ import { SharedModule } from './shared/shared.module';
 		ChatModule,
 		SharedModule
 	],
-	providers: [UserDataResolver, RoomGuard],
+	providers: [UserDataModelResolver],
 	entryComponents: [],
 	bootstrap: [AppComponent]
 })

@@ -8,7 +8,7 @@ import { SocketService } from '../../chat/shared/services/socket.service';
 import { DialogNewRoomComponent } from '../../shared/dialog/new-room/dialog-new-room.component';
 import { DialogParams } from '../../shared/dialog/new-user/dialog-new-user.component';
 import { DialogUserType } from '../../shared/dialog/new-user/dialog-user-type';
-import { UserData, UserDataResolver } from '../../shared/resolvers/user-data-resolver';
+import { UserData, UserDataModelResolver } from '../../shared/resolvers/user-data-model-resolver';
 
 
 @Component({
@@ -32,12 +32,12 @@ export class RoomComponent implements OnInit, AfterViewInit {
 		private socketService: SocketService,
 		public snackBar: MatSnackBar,
 		private router: Router,
-		private userDataResolver: UserDataResolver,
+		private userDataResolver: UserDataModelResolver<UserData>,
 		route: ActivatedRoute) {
 
 		this.model = route.snapshot.data['model'];
-		console.log(this.model)
 		this.defaultDialogUserParams.data.channel = this.model.channel;
+		console.log(this.defaultDialogUserParams.data.channel)
 	}
 
 	ngOnInit() {
@@ -65,7 +65,7 @@ export class RoomComponent implements OnInit, AfterViewInit {
 					this.router.navigateByUrl(`${paramsDialog.channel}`);
 				}, () => {
 					this.router.navigateByUrl('main/user');
-					this.snackBar.open('Please grant access to your camera');
+					this.snackBar.open('Please grant access to your camera', null, {duration: 5000});
 				});
 			});
 		})
