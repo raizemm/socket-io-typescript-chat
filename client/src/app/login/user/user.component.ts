@@ -49,17 +49,6 @@ export class UserComponent implements OnInit, AfterViewInit {
 						return;
 					}
 
-					// const user: User = {
-					// 	id: Math.floor(Math.random() * (1000000)) + 1,
-					// 	name: paramsDialog.username,
-					// 	// channel: paramsDialog.channel,
-					// };
-					// const message: Message = {
-					// 	from: user,
-					// 	action: Action.JOINED,
-					// };
-					// this.socketService.joinChannel(user);
-					// this.socketService.send(message);
 					this.model.username = paramsDialog.username;
 					this.router.navigate(['main', 'room']);
 				}

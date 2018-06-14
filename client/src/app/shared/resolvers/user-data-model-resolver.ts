@@ -1,11 +1,21 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Resolve, Router, RouterStateSnapshot } from '@angular/router';
+import {
+	ActivatedRouteSnapshot,
+	CanActivate,
+	CanLoad,
+	Resolve,
+	Route,
+	Router,
+	RouterStateSnapshot
+} from '@angular/router';
+import { Observable } from 'rxjs/Observable';
+import { SocketService } from '../../chat/shared/services/socket.service';
 
 @Injectable()
-export class UserDataModelResolver<ModelType> implements Resolve<ModelType>, CanActivate {
+export class UserDataModelResolver<ModelType> implements Resolve<ModelType>, CanActivate, CanLoad {
 	model: ModelType;
 
-	constructor(private router: Router) {}
+	constructor(private router: Router, private socketService: SocketService) {}
 
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
 		this.model = null;
@@ -20,6 +30,15 @@ export class UserDataModelResolver<ModelType> implements Resolve<ModelType>, Can
 			this.router.navigateByUrl('/main/user');
 			return null;
 		}
+	}
+
+	canLoad(route: Route): boolean | Observable<boolean> | Promise<boolean> {
+		if (this.socketService.localStream) {
+			return true;
+		}
+
+		this.router.navigateByUrl('/main/user');
+		return false;
 	}
 
 	create(modelFunction: () => ModelType): ModelType {

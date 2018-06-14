@@ -16,9 +16,9 @@ import { ChatComponent } from './chat.component';
 		MaterialModule,
 		ChatRoutingModule,
 	],
-	declarations: [ChatComponent, DialogNewRoomComponent, DialogNewUserComponent],
+	declarations: [ChatComponent],
 	providers: [ChatGuard],
-	entryComponents: [DialogNewUserComponent, DialogNewRoomComponent]
+	entryComponents: []
 })
 export class ChatModule {
 }

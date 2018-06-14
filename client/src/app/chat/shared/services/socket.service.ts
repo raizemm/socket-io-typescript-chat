@@ -93,7 +93,7 @@ export class SocketService {
 
 	public onUsernames(): Observable<string[]> {
 		return new Observable<string[]>(observer => {
-			this.socket.on('usernames', (usernames) => observer.next(usernames))
+			this.socket.on('usernames', usernames => observer.next(usernames))
 		})
 	}
 

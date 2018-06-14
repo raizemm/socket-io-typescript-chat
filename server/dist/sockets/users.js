@@ -12,6 +12,7 @@ var UsersSocket = /** @class */ (function () {
     UsersSocket.prototype.addSocket = function (socket) {
         var _this = this;
         var userData = socket.handshake.session.userData;
+        console.log(userData);
         if (!(userData.channel in this.channels)) {
             this.channels[userData.channel] = {};
         }
@@ -27,11 +28,11 @@ var UsersSocket = /** @class */ (function () {
         }
         this.channels[userData.channel][socket.id] = socket;
         this.sockets[socket.id] = socket;
-        if (this.usernames.indexOf(userData.name) !== -1) {
+        if (this.usernames.indexOf(userData.username) !== -1) {
             return;
         }
         else {
-            this.usernames.push(userData.name);
+            this.usernames.push(userData.username);
             socket.join(this.channel);
             this.io.to(this.channel).emit('usernames', this.usernames);
         }

@@ -117,6 +117,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	private initIoConnection(): void {
 		this.socketService.getLocalStream().subscribe(stream => {
+			console.log(stream)
 			this.stream = stream;
 			this.createStreamElement(this.streamContainer.nativeElement, stream);
 		});
@@ -250,7 +251,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 	public onClickUserInfo() {
 		this.openUserPopup({
 			data: {
-				username: this.user.name,
+				username: this.user.username,
 				channel: this.user.channel,
 				title: 'Edit Details',
 				dialogType: DialogUserType.EDIT
