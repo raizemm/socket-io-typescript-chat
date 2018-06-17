@@ -21,7 +21,7 @@ export class UserComponent implements OnInit, AfterViewInit {
 		data: {
 			title: 'Welcome',
 			dialogType: DialogUserType.NEW,
-			// username: '',
+			username: '',
 		}
 	};
 	dialogRef: MatDialogRef<DialogNewUserComponent> | null;

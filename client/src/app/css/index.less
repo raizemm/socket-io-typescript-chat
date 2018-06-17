@@ -1,12 +1,12 @@
 @import url('./chat/chat.less');
 @import url('./chat/dialog-user/dialog-user.less');
+@import url('./chat/dialog-room/dialog-room.less');
 
 .app-content {
 	//width: 100%;
 	//height: 100%;
 	overflow-y: hidden;
 	overflow-x: auto;
-	box-sizing: border-box;
 	transition: 500ms visibility ease-in;
 }
 
@@ -31,6 +31,7 @@ body, html {
 .mat-drawer-container {
 	display: flex;
 	flex-direction: column;
+	height: 100%;
 }
 
 .cdk-global-overlay-wrapper {

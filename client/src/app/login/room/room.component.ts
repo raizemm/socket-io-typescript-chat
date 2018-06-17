@@ -7,7 +7,7 @@ import { SocketService } from '../../chat/shared/services/socket.service';
 import { DialogNewRoomComponent } from '../../shared/dialog/new-room/dialog-new-room.component';
 import { DialogParams } from '../../shared/dialog/new-user/dialog-new-user.component';
 import { DialogUserType } from '../../shared/dialog/new-user/dialog-user-type';
-import { UserData, UserDataModelResolver } from '../../shared/resolvers/user-data-model-resolver';
+import { UserData } from '../../shared/resolvers/user-data-model-resolver';
 
 @Component({
 	selector: 'tcc-room',
@@ -30,10 +30,10 @@ export class RoomComponent implements OnInit, AfterViewInit {
 		private socketService: SocketService,
 		public snackBar: MatSnackBar,
 		private router: Router,
-		// private userDataResolver: UserDataModelResolver<UserData>,
 		route: ActivatedRoute) {
 
 		this.model = route.snapshot.data['model'];
+		console.log(this.model)
 		this.defaultDialogUserParams.data.channel = this.model.channel;
 	}
 
@@ -57,10 +57,7 @@ export class RoomComponent implements OnInit, AfterViewInit {
 				}
 
 				this.model.channel = paramsDialog.channel;
-
 				this.socketService.setup().then(() => {
-
-					// this.userDataResolver.model.channel = paramsDialog.channel;
 					const message: Message = {
 						from: this.model,
 						action: Action.JOINED,

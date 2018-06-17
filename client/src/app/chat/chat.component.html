@@ -1,4 +1,4 @@
-<div class="container" [@appear]>
+<div class="container" [@appear] #form="ngForm" ngForm caInheritForm="fo">
 	<mat-toolbar color="primary">
 		<span>Typescript Chat</span>
 	</mat-toolbar>
@@ -45,6 +45,7 @@
 							#inputMessage
 							maxlength="140"
 							placeholder="Type your message"
+							name="message"
 							[(ngModel)]="messageContent"
 							(keyup.enter)="sendMessage(messageContent)">
 						<mat-hint align="end">{{inputMessage.value.length}}/140</mat-hint>
@@ -53,8 +54,5 @@
 			</mat-card>
 		</div>
 	</div>
-	<div class="users-streams" #streamContainer >
-		<!--<video class="video-stream"  type="video/mp4"></video>-->
-	</div>
-
+	<div class="users-streams" #streamContainer></div>
 </div>

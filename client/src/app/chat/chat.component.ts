@@ -58,6 +58,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 	showChat: boolean = false;
 	ioConnection: Subscription = Subscription.EMPTY;
 	dialogRef: MatDialogRef<DialogNewUserComponent> | null;
+	test: string;
 
 	stream: MediaStream = null;
 	// getting a reference to the overall list, which is the parent container of the list items
@@ -88,7 +89,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 	}
 
 	ngAfterViewInit(): void {
-
 		// subscribing to any changes in the list of items / messages
 		this.matListItems.changes.subscribe(elements => {
 			this.scrollToBottom();
@@ -108,25 +108,17 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 		}
 	}
 
-	// private initModel(): void {
-	// 	const randomId = this.getRandomId();
-	// 	this.user = {
-	// 		id: randomId,
-	// 	};
-	// }
-
 	private initIoConnection(): void {
 		this.socketService.getLocalStream().subscribe(stream => {
 			console.log(stream)
 			this.stream = stream;
-			this.createStreamElement(this.streamContainer.nativeElement, stream);
+			this.createStreamElement(this.streamContainer.nativeElement, stream, 'local-stream');
 		});
 
 		this.socketService.onJoinChannel()
 			.subscribe(user => {
-				console.log(user)
 				this.user = user;
-			})
+			});
 
 		this.ioConnection = this.socketService.onMessage()
 			.subscribe((message: Message) => {
@@ -137,7 +129,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 
 		this.socketService.onNewPeer()
 			.subscribe((peer: any) => {
-				console.log(peer)
 				if (peer.id in this.peers) {
 					return;
 				}
@@ -157,7 +148,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 				};
 
 				peerConnection.onaddstream = event => {
-					this.createStreamElement(this.streamContainer.nativeElement, event.stream);
+					this.createStreamElement(this.streamContainer.nativeElement, event.stream, 'remote');
 				};
 
 				/* Add our local stream */
@@ -306,10 +297,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.socketService.changeUsername(message);
 	}
 
-	private createStreamElement(element, stream): void {
+	private createStreamElement(element: ElementRef, stream: MediaStream, name: string): void {
 		const videoElement = this.renderer.createElement('video');
 		this.renderer.setProperty(videoElement, 'type', 'video/mp4');
 		this.renderer.setProperty(videoElement, 'autoplay', 'true');
+		this.renderer.addClass(videoElement, name);
 		videoElement.srcObject = stream;
 		// videoElement.play();
 		this.renderer.appendChild(element, videoElement);
